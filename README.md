@@ -124,7 +124,65 @@ rm -f "$LOCK_FILE"
 
 gor@testsrv:~$ sudo chmod +x nginx-report.sh
 gor@testsrv:~$ sudo  /usr/local/bin/nginx-report.sh
+
 gor@testsrv:~$ sudo crontab -l
 0 * * * * /usr/local/bin/nginx-report.sh >> /var/log/nginx-report-cron.log 2>&1
+
+gor@testsrv:~$ cat /var/log/nginx-report-cron.log
++ LOG_FILE=/var/log/nginx/access.log
++ TEMP_DIR=/tmp/nginx-report
++ LOCK_FILE=/tmp/nginx-report/lock
++ REPORT_FILE=/tmp/nginx-report/report.txt
++ MAIL_TO=m.guseva@kalinaoil.pro
++ MAIL_FROM=goryacheva@bazis.vrn.ru
+++ date '+%Y-%m-%d %H:%M'
++ SUBJECT='Nginx Report: 2025-12-08 14:00'
++ mkdir -p /tmp/nginx-report
++ '[' -f /tmp/nginx-report/lock ']'
++ touch /tmp/nginx-report/lock
++ '[' -f /tmp/nginx-report/last_run ']'
+++ cat /tmp/nginx-report/last_run
++ LAST_RUN=08/дек/2025:13:19:47
++ date +%d/%b/%Y:%H:%M:%S
++ grep 08/дек/2025:13:19:47 /var/log/nginx/access.log
++ cp /var/log/nginx/access.log /tmp/nginx-report/recent.log
++ echo 'Отчёт по Nginx'
+++ date +%d/%b/%Y:%H:%M:%S
++ echo 'Период: с 08/дек/2025:13:19:47 до 08/дек/2025:14:00:01'
++ echo =========================================
++ echo ''
++ echo '1. IP‑адреса с наибольшим числом запросов:'
++ awk '{print $1}' /tmp/nginx-report/recent.log
++ sort
++ uniq -c
++ sort -nr
++ head -10
++ echo ''
++ echo '2. Запрашиваемые URL с наибольшим числом запросов:'
++ awk '{print $7}' /tmp/nginx-report/recent.log
++ sort
++ uniq -c
++ sort -nr
++ head -10
++ echo ''
++ echo '3. Ошибки веб‑сервера (HTTP-коды 4xx, 5xx):'
++ grep -E ' "(4|5)[0-9][0-9] "' /tmp/nginx-report/recent.log
++ awk '{print $9, $7}'
++ sort
++ uniq -c
++ sort -nr
++ echo ''
++ echo '4. Все HTTP‑коды ответов и их количество:'
++ awk '{print $9}' /tmp/nginx-report/recent.log
++ grep -E '^[1-5][0-9][0-9]$'
++ sort
++ uniq -c
++ sort -nr
++ command -v mail
++ mail -s 'Nginx Report: 2025-12-08 14:00' -r goryacheva@bazis.vrn.ru m.guseva@kalinaoil.pro
++ rm -f /tmp/nginx-report/lock
+
 ```
-![Image alt](https://github.com/bezzzhizni-coder/DZ09Bash/blob/7db62c3967fe63690156af9edd9d9c818a548689/mailreport.PNG)
+![Image alt](https://github.com/bezzzhizni-coder/DZ09Bash/blob/7db62c3967fe6369
+
+0156af9edd9d9c818a548689/mailreport.PNG)
