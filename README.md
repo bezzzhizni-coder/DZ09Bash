@@ -183,6 +183,4 @@ gor@testsrv:~$ cat /var/log/nginx-report-cron.log
 + rm -f /tmp/nginx-report/lock
 
 ```
-![Image alt](https://github.com/bezzzhizni-coder/DZ09Bash/blob/7db62c3967fe6369
-
-0156af9edd9d9c818a548689/mailreport.PNG)
+![Image alt](https://github.com/bezzzhizni-coder/DZ09Bash/blob/7db62c3967fe63690156af9edd9d9c818a548689/mailreport.PNG)
