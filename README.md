@@ -124,5 +124,7 @@ rm -f "$LOCK_FILE"
 
 gor@testsrv:~$ sudo chmod +x nginx-report.sh
 gor@testsrv:~$ sudo  /usr/local/bin/nginx-report.sh
+gor@testsrv:~$ sudo crontab -l
+0 * * * * /usr/local/bin/nginx-report.sh >> /var/log/nginx-report-cron.log 2>&1
 ```
 ![Image alt](https://github.com/bezzzhizni-coder/DZ09Bash/blob/7db62c3967fe63690156af9edd9d9c818a548689/mailreport.PNG)
