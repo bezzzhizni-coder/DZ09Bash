@@ -47,3 +47,79 @@ smtp_generic_maps = hash:/etc/postfix/generic
 
 gor@testsrv:~$ sudo echo "test" | mail -s "test" m.guseva@kalinaoil.pro
 2025-12-08T11:03:55.730680+00:00 testsrv postfix/smtp[61027]: D3E1A44CF1: to=<m.guseva@kalinaoil.pro>, relay=smtp.yandex.ru[77.88.21.158]:465, delay=0.87, delays=0.02/0.07/0.19/0.59, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued on mail-nwsmtp-smtp-production-main-71.sas.yp-c.yandex.net 1765191835-s3KHhagLLiE0-PU70LIP1)
+
+
+gor@testsrv:~$ cat /usr/local/bin/nginx-report.sh
+#!/bin/bash -x
+
+LOG_FILE="/var/log/nginx/access.log"  # путь к access.log Nginx
+TEMP_DIR="/tmp/nginx-report"
+LOCK_FILE="$TEMP_DIR/lock"
+REPORT_FILE="$TEMP_DIR/report.txt"
+MAIL_TO="m.guseva@kalinaoil.pro"
+MAIL_FROM="goryacheva@bazis.vrn.ru"
+SUBJECT="Nginx Report: $(date +'%Y-%m-%d %H:%M')"
+
+
+mkdir -p "$TEMP_DIR"
+
+# Проверка на наличие lock‑файла (защита от параллельного запуска)
+if [ -f "$LOCK_FILE" ]; then
+    echo "Другой экземпляр скрипта уже работает. Выход."
+    exit 1
+fi
+
+# Создаём lock‑файл
+touch "$LOCK_FILE"
+
+
+if [ -f "$TEMP_DIR/last_run" ]; then
+    LAST_RUN=$(cat "$TEMP_DIR/last_run")
+else
+
+    LAST_RUN=$(head -1 "$LOG_FILE" | awk '{print $4}' | sed 's/\[//')
+fi
+
+
+date +'%d/%b/%Y:%H:%M:%S' > "$TEMP_DIR/last_run"
+
+
+grep "$LAST_RUN" "$LOG_FILE" > "$TEMP_DIR/recent.log" || cp "$LOG_FILE" "$TEMP_DIR/recent.log"
+
+# Собираем данные
+
+echo "Отчёт по Nginx" > "$REPORT_FILE"
+echo "Период: с $LAST_RUN до $(date +'%d/%b/%Y:%H:%M:%S')" >> "$REPORT_FILE"
+echo "=========================================" >> "$REPORT_FILE"
+
+echo "" >> "$REPORT_FILE"
+echo "1. IP‑адреса с наибольшим числом запросов:" >> "$REPORT_FILE"
+awk '{print $1}' "$TEMP_DIR/recent.log" | sort | uniq -c | sort -nr | head -10 >> "$REPORT_FILE"
+
+echo "" >> "$REPORT_FILE"
+echo "2. Запрашиваемые URL с наибольшим числом запросов:" >> "$REPORT_FILE"
+awk '{print $7}' "$TEMP_DIR/recent.log" | sort | uniq -c | sort -nr | head -10 >> "$REPORT_FILE"
+
+echo "" >> "$REPORT_FILE"
+echo "3. Ошибки веб‑сервера (HTTP-коды 4xx, 5xx):" >> "$REPORT_FILE"
+grep -E ' "(4|5)[0-9][0-9] "' "$TEMP_DIR/recent.log" | awk '{print $9, $7}' | sort | uniq -c | sort -nr >> "$REPORT_FILE"
+
+echo "" >> "$REPORT_FILE"
+echo "4. Все HTTP‑коды ответов и их количество:" >> "$REPORT_FILE"
+awk '{print $9}' "$TEMP_DIR/recent.log" | grep -E '^[1-5][0-9][0-9]$' | sort | uniq -c | sort -nr >> "$REPORT_FILE"
+
+# Отправляем письмо
+if command -v mail > /dev/null; then
+    mail -s "$SUBJECT" -r "$MAIL_FROM" "$MAIL_TO" < "$REPORT_FILE"
+elif command -v sendmail > /dev/null; then
+    (echo "Subject: $SUBJECT"; echo "From: $MAIL_FROM"; echo ""; cat "$REPORT_FILE") | sendmail "$MAIL_TO"
+else
+    echo "Не найден mail или sendmail. Установите пакет mailutils или sendmail."
+fi
+
+# Удаляем lock‑файл
+rm -f "$LOCK_FILE"
+
+# rm -f "$TEMP_DIR/recent.log"
+
+gor@testsrv:~$ sudo chmod +x nginx-report.sh
