@@ -102,7 +102,7 @@ awk '{print $7}' "$TEMP_DIR/recent.log" | sort | uniq -c | sort -nr | head -10 >
 
 echo "" >> "$REPORT_FILE"
 echo "3. Ошибки веб‑сервера (HTTP-коды 4xx, 5xx):" >> "$REPORT_FILE"
-grep -E ' "(4|5)[0-9][0-9] "' "$TEMP_DIR/recent.log" | awk '{print $9, $7}' | sort | uniq -c | sort -nr >> "$REPORT_FILE"
+awk '{print $9}' "$TEMP_DIR/recent.log" | grep -E '^[45][0-9][0-9]$' | sort | uniq -c | sort -nr >> "$REPORT_FILE"
 
 echo "" >> "$REPORT_FILE"
 echo "4. Все HTTP‑коды ответов и их количество:" >> "$REPORT_FILE"
