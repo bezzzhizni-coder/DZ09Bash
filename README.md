@@ -128,7 +128,7 @@ gor@testsrv:~$ sudo  /usr/local/bin/nginx-report.sh
 gor@testsrv:~$ sudo crontab -l
 0 * * * * /usr/local/bin/nginx-report.sh >> /var/log/nginx-report-cron.log 2>&1
 
-gor@testsrv:~$ cat /var/log/nginx-report-cron.log
+gor@testsrv:~$ sudo  /usr/local/bin/nginx-report.sh
 + LOG_FILE=/var/log/nginx/access.log
 + TEMP_DIR=/tmp/nginx-report
 + LOCK_FILE=/tmp/nginx-report/lock
@@ -136,19 +136,19 @@ gor@testsrv:~$ cat /var/log/nginx-report-cron.log
 + MAIL_TO=m.guseva@kalinaoil.pro
 + MAIL_FROM=goryacheva@bazis.vrn.ru
 ++ date '+%Y-%m-%d %H:%M'
-+ SUBJECT='Nginx Report: 2025-12-08 14:00'
++ SUBJECT='Nginx Report: 2025-12-10 09:39'
 + mkdir -p /tmp/nginx-report
 + '[' -f /tmp/nginx-report/lock ']'
 + touch /tmp/nginx-report/lock
 + '[' -f /tmp/nginx-report/last_run ']'
 ++ cat /tmp/nginx-report/last_run
-+ LAST_RUN=08/дек/2025:13:19:47
++ LAST_RUN=10/дек/2025:09:33:21
 + date +%d/%b/%Y:%H:%M:%S
-+ grep 08/дек/2025:13:19:47 /var/log/nginx/access.log
++ grep 10/дек/2025:09:33:21 /var/log/nginx/access.log
 + cp /var/log/nginx/access.log /tmp/nginx-report/recent.log
 + echo 'Отчёт по Nginx'
 ++ date +%d/%b/%Y:%H:%M:%S
-+ echo 'Период: с 08/дек/2025:13:19:47 до 08/дек/2025:14:00:01'
++ echo 'Период: с 10/дек/2025:09:33:21 до 10/дек/2025:09:39:02'
 + echo =========================================
 + echo ''
 + echo '1. IP‑адреса с наибольшим числом запросов:'
@@ -166,21 +166,22 @@ gor@testsrv:~$ cat /var/log/nginx-report-cron.log
 + head -10
 + echo ''
 + echo '3. Ошибки веб‑сервера (HTTP-коды 4xx, 5xx):'
-+ grep -E ' "(4|5)[0-9][0-9] "' /tmp/nginx-report/recent.log
-+ awk '{print $9, $7}'
++ awk '{print $9}' /tmp/nginx-report/recent.log
 + sort
++ grep -E '^[45][0-9][0-9]$'
 + uniq -c
 + sort -nr
 + echo ''
 + echo '4. Все HTTP‑коды ответов и их количество:'
 + awk '{print $9}' /tmp/nginx-report/recent.log
-+ grep -E '^[1-5][0-9][0-9]$'
 + sort
++ grep -E '^[1-5][0-9][0-9]$'
 + uniq -c
 + sort -nr
 + command -v mail
-+ mail -s 'Nginx Report: 2025-12-08 14:00' -r goryacheva@bazis.vrn.ru m.guseva@kalinaoil.pro
++ mail -s 'Nginx Report: 2025-12-10 09:39' -r goryacheva@bazis.vrn.ru m.guseva@kalinaoil.pro
 + rm -f /tmp/nginx-report/lock
+
 
 ```
 ![Image alt](https://github.com/bezzzhizni-coder/DZ09Bash/blob/7db62c3967fe63690156af9edd9d9c818a548689/mailreport.PNG)
