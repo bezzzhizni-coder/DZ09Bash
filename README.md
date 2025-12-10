@@ -14,6 +14,7 @@ HTTP-коды ответов с указанием их количества (с
 В письме должен быть прописан обрабатываемый временной диапазон.  
 ```
 gor@testsrv:~$ sudo apt install postfix
+gor@testsrv:~$ sudo cat /etc/postfix/main.cf
 # TLS parameters
 smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
 smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
