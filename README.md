@@ -52,7 +52,7 @@ gor@testsrv:~$ sudo echo "test" | mail -s "test" m.guseva@kalinaoil.pro
 gor@testsrv:~$ cat /usr/local/bin/nginx-report.sh
 #!/bin/bash -x
 
-LOG_FILE="/var/log/nginx/access.log"  # путь к access.log Nginx
+LOG_FILE="/var/log/nginx/access.log" 
 TEMP_DIR="/tmp/nginx-report"
 LOCK_FILE="$TEMP_DIR/lock"
 REPORT_FILE="$TEMP_DIR/report.txt"
