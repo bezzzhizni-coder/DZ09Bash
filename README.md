@@ -184,4 +184,4 @@ gor@testsrv:~$ sudo  /usr/local/bin/nginx-report.sh
 
 
 ```
-![Image alt](https://github.com/bezzzhizni-coder/DZ09Bash/blob/7db62c3967fe63690156af9edd9d9c818a548689/mailreport.PNG)
+![Image alt](https://github.com/bezzzhizni-coder/DZ09Bash/blob/668f1cbb32be4c688783c69988d66bf371c60356/mailreport1.PNG)
